@@ -10,16 +10,16 @@ public class GestorEquipos {
     private LinkedList<Equipo> equipos;
     private List<Jugador> jugadoresGlobales;  // Lista global de jugadores
     private static final String[] NOMBRES = {
-        "Juan Pérez", "Luis Gómez", "Carlos Díaz", "Miguel Martínez", "José Rodríguez",
-        "Pedro Fernández", "Javier García", "Andrés López", "David Sánchez", "Fernando Torres",
-        "Alejandro Morales", "Ricardo Ortiz", "Manuel Romero", "Francisco Ríos", "Santiago Campos",
-        "Mario Castro", "Jorge Herrera", "Hugo Gutiérrez", "Raúl Ruiz", "Alberto Vega",
-        "Iván Pardo", "Oscar Molina", "Gabriel Peña", "Víctor Navarro", "Emilio Escobar",
-        "Tomás Ortega", "Rafael Núñez", "Felipe Cruz", "Rubén Castro", "Eduardo Soto",
-        "Ángel Flores", "Martín Serrano", "Diego Gil", "Ignacio Delgado", "Daniel Luna",
-        "Adrián Suárez", "Héctor Guzmán", "Cristian Morales", "Sebastián Aguilar", "Fabián Jiménez",
-        "Nicolás Salinas", "Gonzalo Vázquez", "Lucas Soto", "Ismael Maldonado", "Leandro Márquez",
-        "Matías Ramos", "Pablo Valencia", "Samuel Paredes", "Joaquín Figueroa", "Rodrigo Campos"
+        "Lionel Messi", "Cristiano Ronaldo", "Neymar Jr", "Kylian Mbappé", "Luka Modric",
+        "Sergio Ramos", "Virgil van Dijk", "Mohamed Salah", "Eden Hazard", "Kevin De Bruyne",
+        "Robert Lewandowski", "Harry Kane", "Paulo Dybala", "Sadio Mane", "Raheem Sterling",
+        "Antoine Griezmann", "Luis Suarez", "Gareth Bale", "Paul Pogba", "Karim Benzema",
+        "Manuel Neuer", "Jan Oblak", "Ederson Moraes", "Alisson Becker", "Thibaut Courtois",
+        "Gerard Pique", "Sergio Busquets", "Marcelo Vieira", "Trent Alexander-Arnold", "Andrew Robertson",
+        "Kalidou Koulibaly", "Leonardo Bonucci", "Matthijs de Ligt", "Joshua Kimmich", "Frenkie de Jong",
+        "Thomas Muller", "Jadon Sancho", "Joao Felix", "Pierre-Emerick Aubameyang", "Romelu Lukaku",
+        "Son Heung-min", "Philippe Coutinho", "Christian Eriksen", "David Silva", "Marco Verratti",
+        "Ciro Immobile", "Lorenzo Insigne", "Dries Mertens", "Zlatan Ibrahimovic", "Edinson Cavani"
     };
     private static final String[] POSICIONES = {
         "Arquero", "Defensor", "Mediocampista", "Delantero"
@@ -29,10 +29,9 @@ public class GestorEquipos {
 
     public GestorEquipos() {
         this.equipos = new LinkedList<>();
-        this.jugadoresGlobales = new ArrayList<>();  // Inicializa la lista global de jugadores
+        this.jugadoresGlobales = new ArrayList<>();
     }
 
-    // Métodos para gestionar los equipos
     public void agregarEquipo(Equipo equipo) {
         equipos.add(equipo);
     }
@@ -50,15 +49,11 @@ public class GestorEquipos {
         return null;
     }
 
-    public int obtenerCantidadEquipos() {
-        return equipos.size();
-    }
-
     public LinkedList<Equipo> obtenerEquipos() {
         return equipos;
     }
 
-    // Método para gestionar jugadores globales
+    // jugadres globales
     public void agregarJugadorGlobal(Jugador jugador) {
         jugadoresGlobales.add(jugador);
     }
@@ -67,12 +62,26 @@ public class GestorEquipos {
         return jugadoresGlobales;
     }
 
-    // Método para simular un partido entre dos equipos con desempate
+    // simular partido con desempate agregado
     public void jugarPartido(Equipo equipo1, Equipo equipo2) {
         if (equipo1.obtenerCantidadJugadores() < 11 || equipo2.obtenerCantidadJugadores() < 11) {
             JOptionPane.showMessageDialog(null, "Ambos equipos deben tener al menos 11 jugadores para jugar un partido.");
             return;
         }
+
+        // Mostrar alineaciones
+        StringBuilder alineacion1 = new StringBuilder("Alineación de " + equipo1.getNombre() + ":\n");
+        for (Jugador j : equipo1.obtenerJugadores()) {
+            alineacion1.append(j.getNombre()).append(" - ").append(j.getPosicion()).append(" - ").append(j.getNumeroCamiseta()).append("\n");
+        }
+
+        StringBuilder alineacion2 = new StringBuilder("Alineación de " + equipo2.getNombre() + ":\n");
+        for (Jugador j : equipo2.obtenerJugadores()) {
+            alineacion2.append(j.getNombre()).append(" - ").append(j.getPosicion()).append(" - ").append(j.getNumeroCamiseta()).append("\n");
+        }
+
+        JOptionPane.showMessageDialog(null, alineacion1.toString());
+        JOptionPane.showMessageDialog(null, alineacion2.toString());
 
         int golesEquipo1 = (int) (Math.random() * 5);
         int golesEquipo2 = (int) (Math.random() * 5);
@@ -86,7 +95,7 @@ public class GestorEquipos {
             int penalesEquipo1 = 0;
             int penalesEquipo2 = 0;
 
-            // Cada equipo tiene 5 oportunidades
+            // logica penales
             for (int i = 0; i < 5; i++) {
                 if (Math.random() < 0.7) { // 70% de probabilidad de anotar
                     penalesEquipo1++;
@@ -96,7 +105,7 @@ public class GestorEquipos {
                 }
             }
 
-            // Si sigue empate, se sigue con muerte súbita
+            // Si sigue en empate, se sigue un penal cada uno
             while (penalesEquipo1 == penalesEquipo2) {
                 if (Math.random() < 0.7) {
                     penalesEquipo1++;
@@ -128,7 +137,9 @@ public class GestorEquipos {
             } while (NUMEROS_CAMISETA.contains(numeroCamiseta));
             NUMEROS_CAMISETA.add(numeroCamiseta);
 
-            jugadores.add(new Jugador(nombre, posicion, numeroCamiseta, edad));
+            Jugador jugador = new Jugador(nombre, posicion, numeroCamiseta, edad);
+            jugadores.add(jugador);
+            agregarJugadorGlobal(jugador); // Agregar el jugador a la lista global
         }
         return jugadores;
     }
@@ -147,7 +158,7 @@ public class GestorEquipos {
         }
     }
 
-    // Métodos de validación de entrada
+    // validación de entrada dattos
     public String validarEntradaString(String mensaje) {
         String entrada;
         do {
