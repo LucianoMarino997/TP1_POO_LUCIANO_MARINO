@@ -29,9 +29,10 @@ public class GestorEquipos {
 
     public GestorEquipos() {
         this.equipos = new LinkedList<>();
-        this.jugadoresGlobales = new ArrayList<>();
+        this.jugadoresGlobales = new ArrayList<>();  // Inicializa la lista global de jugadores para poder ser utilizados
     }
 
+    // Métodos para gestionar los equipos
     public void agregarEquipo(Equipo equipo) {
         equipos.add(equipo);
     }
@@ -53,7 +54,7 @@ public class GestorEquipos {
         return equipos;
     }
 
-    // jugadres globales
+    // Método para gestionar jugadores globales
     public void agregarJugadorGlobal(Jugador jugador) {
         jugadoresGlobales.add(jugador);
     }
@@ -62,8 +63,8 @@ public class GestorEquipos {
         return jugadoresGlobales;
     }
 
-    // simular partido con desempate agregado
-    public void jugarPartido(Equipo equipo1, Equipo equipo2) {
+    // Método para simular un partido entre dos equipos con desempate
+    public void jugarPartido(Equipo equipo1, Equipo equipo2, String fase) {
         if (equipo1.obtenerCantidadJugadores() < 11 || equipo2.obtenerCantidadJugadores() < 11) {
             JOptionPane.showMessageDialog(null, "Ambos equipos deben tener al menos 11 jugadores para jugar un partido.");
             return;
@@ -80,8 +81,7 @@ public class GestorEquipos {
             alineacion2.append(j.getNombre()).append(" - ").append(j.getPosicion()).append(" - ").append(j.getNumeroCamiseta()).append("\n");
         }
 
-        JOptionPane.showMessageDialog(null, alineacion1.toString());
-        JOptionPane.showMessageDialog(null, alineacion2.toString());
+        JOptionPane.showMessageDialog(null, "Partido de " + fase + ":\n" + alineacion1.toString() + "\n" + alineacion2.toString());
 
         int golesEquipo1 = (int) (Math.random() * 5);
         int golesEquipo2 = (int) (Math.random() * 5);
@@ -95,7 +95,7 @@ public class GestorEquipos {
             int penalesEquipo1 = 0;
             int penalesEquipo2 = 0;
 
-            // logica penales
+            // Cada equipo tiene 5 oportunidades
             for (int i = 0; i < 5; i++) {
                 if (Math.random() < 0.7) { // 70% de probabilidad de anotar
                     penalesEquipo1++;
@@ -105,7 +105,7 @@ public class GestorEquipos {
                 }
             }
 
-            // Si sigue en empate, se sigue un penal cada uno
+            // Si sigue empate, se sigue con muerte súbita
             while (penalesEquipo1 == penalesEquipo2) {
                 if (Math.random() < 0.7) {
                     penalesEquipo1++;
@@ -133,7 +133,7 @@ public class GestorEquipos {
             int edad = 18 + RANDOM.nextInt(23); // Edad entre 18 y 40
             int numeroCamiseta;
             do {
-                numeroCamiseta = 1 + RANDOM.nextInt(99); // Número de camiseta entre 1 y 99
+                numeroCamiseta = 1 + RANDOM.nextInt(99); 
             } while (NUMEROS_CAMISETA.contains(numeroCamiseta));
             NUMEROS_CAMISETA.add(numeroCamiseta);
 
@@ -158,23 +158,92 @@ public class GestorEquipos {
         }
     }
 
-    // validación de entrada dattos
+    // Método para jugar un torneo
+    public void jugarTorneo() {
+        if (equipos.size() < 4) {
+            JOptionPane.showMessageDialog(null, "Se necesitan al menos cuatro equipos para jugar un torneo.");
+            return;
+        }
+
+        // Verificar si el número de equipos es 4, 8, 16 o 32
+        int numEquipos = equipos.size();
+        if (numEquipos != 4 && numEquipos != 8 && numEquipos != 16 && numEquipos != 32) {
+            JOptionPane.showMessageDialog(null, "El número de equipos debe ser 4, 8, 16 o 32 para un torneo válido.");
+            return;
+        }
+
+        LinkedList<Equipo> equiposTorneo = new LinkedList<>(equipos);
+        while (equiposTorneo.size() > 1) {
+            String fase = determinarFase(equiposTorneo.size());
+            LinkedList<Equipo> ganadores = new LinkedList<>();
+            for (int i = 0; i < equiposTorneo.size(); i += 2) {
+                if (i + 1 < equiposTorneo.size()) {
+                    Equipo equipo1 = equiposTorneo.get(i);
+                    Equipo equipo2 = equiposTorneo.get(i + 1);
+                    jugarPartido(equipo1, equipo2, fase);
+
+                    int golesEquipo1 = (int) (Math.random() * 5);
+                    int golesEquipo2 = (int) (Math.random() * 5);
+                    Equipo equipoGanador;
+                    if (golesEquipo1 > golesEquipo2) {
+                        equipoGanador = equipo1;
+                    } else {
+                        equipoGanador = equipo2;
+                    }
+                    ganadores.add(equipoGanador);
+
+                    if (equiposTorneo.size() > 2) { // Solo mostrar el mensaje si no es la final
+                        JOptionPane.showMessageDialog(null, "El equipo " + equipoGanador.getNombre() + " pasa de ronda en " + fase + "!");
+                    }
+                } else {
+                    ganadores.add(equiposTorneo.get(i));
+                }
+            }
+            equiposTorneo = ganadores;
+        }
+        Equipo campeon = equiposTorneo.getFirst();
+        JOptionPane.showMessageDialog(null, "El campeón del torneo es: " + campeon.getNombre()+"!!");
+    }
+    
+    private String determinarFase(int numEquipos) {
+        switch (numEquipos) {
+            case 32:
+                return "16avos de final";
+            case 16:
+                return "octavos de final";
+            case 8:
+                return "cuartos de final";
+            case 4:
+                return "semifinal";
+            case 2:
+                return "final";
+            default:
+                return "";
+        }
+    }
+
+
+
+    // Métodos de validación de entrada
     public String validarEntradaString(String mensaje) {
         String entrada;
         do {
             entrada = JOptionPane.showInputDialog(mensaje);
-            if (entrada == null || entrada.trim().isEmpty()) {
+            if (entrada == null) return null;
+            if (entrada.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Entrada no válida. Intente de nuevo.");
             }
-        } while (entrada == null || entrada.trim().isEmpty());
+        } while (entrada.trim().isEmpty());
         return entrada;
     }
 
-    public int validarEntradaInt(String mensaje, int min, int max) {
-        int entrada;
+    public Integer validarEntradaInt(String mensaje, int min, int max) {
+        Integer entrada;
         do {
             try {
-                entrada = Integer.parseInt(JOptionPane.showInputDialog(mensaje));
+                String input = JOptionPane.showInputDialog(mensaje);
+                if (input == null) return null;
+                entrada = Integer.parseInt(input);
                 if (entrada < min || entrada > max) {
                     JOptionPane.showMessageDialog(null, "Entrada fuera de rango. Intente de nuevo.");
                     continue;
@@ -185,6 +254,7 @@ public class GestorEquipos {
             }
         } while (true);
     }
+
 }
 
         		
